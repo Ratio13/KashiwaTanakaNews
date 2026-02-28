@@ -9,49 +9,30 @@ const INDEX = "https://www.city.kashiwa.lg.jp/shinchaku/index.html";
 const ua = { "user-agent": "kashiwa-news-bot" };
 
 async function classifyByLLM({ title, body }) {
-  const prompt = `
-次の記事が誰向けか判定してください。
-対象は以下の3つのみ：
-- student（学生向け）
-- worker（社会人向け）
-- senior（高齢者向け）
-
-複数該当可。
-必ずJSON配列のみで出力してください。
-例: ["student","worker"]
-
-記事タイトル:
-${title}
-
-記事本文:
-${body}
-`;
+  const prompt = `student/worker/seniorから複数選びJSON配列のみで返して\nタイトル:${title}\n本文:${body}`;
 
   try {
-    const response = await fetch(process.env.LLM_API_URL, {
+    const r = await fetch(process.env.GEMINI_API_URL, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${process.env.LLM_API_KEY}`
+        "content-type": "application/json",
+        "x-goog-api-key": process.env.GEMINI_API_KEY,
       },
       body: JSON.stringify({
-        model: "gpt-4o-mini",
-        messages: [
-          { role: "user", content: prompt }
-        ],
-        temperature: 0
-      })
+        contents: [{ role: "user", parts: [{ text: prompt }] }],
+        generationConfig: { temperature: 0 },
+      }),
     });
 
-    const data = await response.json();
-    const text = data.choices[0].message.content.trim();
-
+    const data = await r.json();
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() ?? "[]";
     return JSON.parse(text);
   } catch (e) {
     console.error("分類失敗:", e);
-    return ["worker"]; // 失敗時のデフォルト
+    return ["worker"];
   }
 }
+
 
 (async () => {
   const indexHtml = await (await fetch(INDEX, { headers: ua })).text();

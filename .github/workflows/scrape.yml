@@ -14,6 +14,9 @@ jobs:
       - run: npm init -y
       - run: npm i cheerio
       - run: node scripts/scrape-kashiwa.js
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GEMINI_API_URL: ${{ secrets.GEMINI_API_URL }}
       - run: |
           git config user.name "github-actions"
           git config user.email "actions@users.noreply.github.com"
