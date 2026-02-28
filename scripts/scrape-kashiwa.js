@@ -9,7 +9,7 @@ const INDEX = "https://www.city.kashiwa.lg.jp/shinchaku/index.html";
 const ua = { "user-agent": "kashiwa-news-bot" };
 
 async function classifyByLLM({ title, body }) {
-  const prompt = `student/worker/seniorから複数選びJSON配列のみで返して\nタイトル:${title}\n本文:${body}`;
+  const prompt = `このページの新着情報リストを見て、それぞれの情報をstudent/worker/seniorのどれに適合するか選んでタグを付けて、JSON配列のみで返して\nタイトル:${title}\n本文:${body}`;
 
   try {
     const r = await fetch(process.env.GEMINI_API_URL, {
