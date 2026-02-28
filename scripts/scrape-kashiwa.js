@@ -1,3 +1,7 @@
+console.log("RUNNING FILE:", __filename);
+console.log("GIT SHA:", process.env.GITHUB_SHA);
+console.log("SCRIPT VERSION: LLM-AUDIENCE-ENABLED");
+
 const fs = require("node:fs");
 const cheerio = require("cheerio");
 
