@@ -1,0 +1,17 @@
+<!doctype html><meta charset="utf-8">
+<h1>柏市 新着</h1>
+<div id="meta"></div><ul id="list"></ul>
+<script>
+(async()=>{
+  const r=await fetch("./data/news.json",{cache:"no-store"});
+  const d=await r.json();
+  meta.textContent="最終取得: "+new Date(d.fetchedAt).toLocaleString();
+  list.innerHTML="";
+  for(const it of d.items){
+    const li=document.createElement("li");
+    li.innerHTML=`<a href="${it.url}" target="_blank" rel="noopener">${it.title}</a>
+      <div style="font-size:.9em">${[it.updated,it.body].filter(Boolean).join(" / ")}</div>`;
+    list.appendChild(li);
+  }
+})().catch(e=>meta.textContent="読み込み失敗: "+e.message);
+</script>
