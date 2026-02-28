@@ -1,17 +1,358 @@
-<!doctype html><meta charset="utf-8">
-<h1>柏市 新着</h1>
-<div id="meta"></div><ul id="list"></ul>
-<script>
-(async()=>{
-  const r=await fetch("./data/news.json",{cache:"no-store"});
-  const d=await r.json();
-  meta.textContent="最終取得: "+new Date(d.fetchedAt).toLocaleString();
-  list.innerHTML="";
-  for(const it of d.items){
-    const li=document.createElement("li");
-    li.innerHTML=`<a href="${it.url}" target="_blank" rel="noopener">${it.title}</a>
-      <div style="font-size:.9em">${[it.updated,it.body].filter(Boolean).join(" / ")}</div>`;
-    list.appendChild(li);
-  }
-})().catch(e=>meta.textContent="読み込み失敗: "+e.message);
-</script>
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>柏市 最新アップデート情報 - 柏の葉・柏たなか地区</title>
+  <meta name="description" content="柏市（柏の葉・柏たなか地区）の最新情報を年代別に提供する住民サポートサイトです。">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Kiwi+Maru:wght@400;500&family=Zen+Maru+Gothic:wght@400;700&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --primary-color: #f7b42c;
+      --secondary-color: #f89b29;
+      --bg-color: #fff9f0;
+      --header-bg: #ffffff;
+      --text-color: #4a4a4a;
+      --card-bg: #ffffff;
+      --border-radius: 20px;
+      --shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+      --student-color: #4facfe;
+      --worker-color: #f093fb;
+      --senior-color: #43e97b;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Zen Maru Gothic', sans-serif;
+      line-height: 1.6;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      font-size: 18px;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    header {
+      background-color: var(--header-bg);
+      padding: 60px 0 40px;
+      text-align: center;
+      border-bottom: 4px solid #fdf0d5;
+    }
+
+    header h1 {
+      font-family: 'Kiwi Maru', serif;
+      font-size: 2.5rem;
+      color: #d17b0f;
+      margin-bottom: 10px;
+    }
+
+    .subtitle {
+      font-size: 1.1rem;
+      color: #666;
+      margin-bottom: 20px;
+    }
+
+    nav {
+      background-color: white;
+      padding: 10px 0;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    }
+
+    .tabs {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+
+    .tab-btn {
+      padding: 12px 30px;
+      border: none;
+      background: #f0f0f0;
+      border-radius: 50px;
+      font-weight: bold;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      color: #777;
+    }
+
+    .tab-btn.active[data-tab="student"] {
+      background: var(--student-color);
+      color: white;
+      box-shadow: 0 8px 20px rgba(79, 172, 254, 0.3);
+    }
+
+    .tab-btn.active[data-tab="worker"] {
+      background: var(--worker-color);
+      color: white;
+      box-shadow: 0 8px 20px rgba(240, 147, 251, 0.3);
+    }
+
+    .tab-btn.active[data-tab="senior"] {
+      background: var(--senior-color);
+      color: white;
+      box-shadow: 0 8px 20px rgba(67, 233, 123, 0.3);
+    }
+
+    .tab-btn:hover:not(.active) {
+      transform: translateY(-2px);
+      background: #e5e5e5;
+    }
+
+    main {
+      padding: 50px 0;
+    }
+
+    .news-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 30px;
+      opacity: 1;
+      transition: opacity 0.3s ease;
+    }
+
+    .news-card {
+      background: var(--card-bg);
+      border-radius: var(--border-radius);
+      padding: 30px;
+      box-shadow: var(--shadow);
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      flex-direction: column;
+      transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+      border: 1px solid rgba(255, 255, 255, 0.8);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .news-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 4px;
+      height: 100%;
+      background: var(--primary-color);
+      opacity: 0.5;
+    }
+
+    .news-card.student::before {
+      background: var(--student-color);
+    }
+
+    .news-card.worker::before {
+      background: var(--worker-color);
+    }
+
+    .news-card.senior::before {
+      background: var(--senior-color);
+    }
+
+    .news-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      border-color: var(--primary-color);
+    }
+
+    .news-date {
+      font-size: 0.85rem;
+      color: #999;
+      margin-bottom: 15px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .news-title {
+      font-size: 1.25rem;
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 15px;
+      line-height: 1.5;
+    }
+
+    .news-body {
+      font-size: 0.95rem;
+      color: #666;
+      margin-bottom: 20px;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      flex-grow: 1;
+    }
+
+    .btn-more {
+      align-self: flex-start;
+      padding: 8px 20px;
+      border-radius: 50px;
+      background: #f8f9fa;
+      font-size: 0.85rem;
+      font-weight: bold;
+      color: #555;
+      border: 1px solid #eee;
+      transition: all 0.3s ease;
+    }
+
+    .news-card:hover .btn-more {
+      background: var(--primary-color);
+      color: white;
+      border-color: transparent;
+    }
+
+    .empty-msg {
+      text-align: center;
+      padding: 100px 0;
+      color: #999;
+      font-size: 1.2rem;
+      grid-column: 1 / -1;
+    }
+
+    footer {
+      padding: 60px 0;
+      text-align: center;
+      color: #aaa;
+      font-size: 0.9rem;
+      background: white;
+    }
+
+    @media (max-width: 600px) {
+      header h1 {
+        font-size: 1.8rem;
+      }
+
+      .tab-btn {
+        padding: 10px 20px;
+        font-size: 0.9rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <div class="container">
+      <h1>柏市 最新アップデート</h1>
+      <p class="subtitle">あなたにぴったりの情報を、もっと身近に。</p>
+      <div id="last-fetched" style="font-size: 0.8rem; color: #bbb;"></div>
+    </div>
+  </header>
+
+  <nav>
+    <div class="container">
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="worker">社会人向け</button>
+        <button class="tab-btn" data-tab="student">学生向け</button>
+        <button class="tab-btn" data-tab="senior">高齢者向け</button>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container">
+    <div id="news-grid" class="news-grid">
+      <!-- JSで挿入 -->
+    </div>
+  </main>
+
+  <footer>
+    <div class="container">
+      <p>&copy; 2026 柏市地域情報サポーター</p>
+    </div>
+  </footer>
+
+  <script>
+    const labels = {
+      student: "学生向け",
+      worker: "社会人向け",
+      senior: "高齢者向け"
+    };
+
+    let allNews = [];
+
+    async function loadNews() {
+      const grid = document.getElementById('news-grid');
+      grid.style.opacity = '0.5';
+
+      try {
+        const res = await fetch('data/news.json', { cache: 'no-store' });
+        const data = await res.json();
+        allNews = data.items;
+
+        document.getElementById('last-fetched').textContent =
+          `最終取得: ${new Date(data.fetchedAt).toLocaleString('ja-JP')}`;
+
+        renderNews('worker'); // デフォルト
+      } catch (e) {
+        console.error(e);
+        grid.innerHTML = '<div class="empty-msg">データの読み込みに失敗しました。</div>';
+      } finally {
+        grid.style.opacity = '1';
+      }
+    }
+
+    function renderNews(category) {
+      const grid = document.getElementById('news-grid');
+      grid.innerHTML = '';
+
+      const filtered = allNews.filter(item =>
+        item.audiences && item.audiences.includes(category)
+      );
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `<div class="empty-msg">${labels[category]}の情報は現在ありません。</div>`;
+        return;
+      }
+
+      filtered.forEach(item => {
+        const card = document.createElement('a');
+        card.className = `news-card ${category}`;
+        card.href = item.url;
+        card.target = '_blank';
+        card.rel = 'noopener';
+
+        card.innerHTML = `
+                <div class="news-date">${item.updated || '新着'}</div>
+                <div class="news-title">${item.title}</div>
+                <div class="news-body">${item.body || ''}</div>
+                <div class="btn-more">詳細を見る</div>
+            `;
+        grid.appendChild(card);
+      });
+    }
+
+    // Tab Events
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        renderNews(btn.dataset.tab);
+      });
+    });
+
+    loadNews();
+  </script>
+
+</body>
+
+</html>
