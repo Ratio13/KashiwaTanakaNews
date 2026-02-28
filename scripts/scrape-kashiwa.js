@@ -38,33 +38,41 @@ async function classifyByLLM({ title, body }) {
   const indexHtml = await (await fetch(INDEX, { headers: ua })).text();
   const $ = cheerio.load(indexHtml);
 
-  const urls = [...new Set(
-    $("a").map((_, a) => {
+  // 新着情報のメインリストのみをターゲットにする
+  const newsLinks = $("#tmp_contents ul li a")
+    .map((_, a) => {
       const href = $(a).attr("href");
       if (!href) return null;
-      return new URL(href, INDEX).toString();
-    }).get().filter(Boolean)
-  )]
-    .filter(u => u.startsWith("https://www.city.kashiwa.lg.jp/"))
+      return {
+        title: $(a).text().trim(),
+        url: new URL(href, INDEX).toString()
+      };
+    })
+    .get()
+    .filter(item => item.url.startsWith("https://www.city.kashiwa.lg.jp/"))
     .slice(0, 20); // APIコスト削減のため20件まで
 
   const items = [];
 
-  for (const url of urls) {
+  for (const { title: rawTitle, url } of newsLinks) {
     try {
       const h = await (await fetch(url, { headers: ua })).text();
       const d = cheerio.load(h);
 
-      const title = d("h1").first().text().trim();
+      const title = d("h1").first().text().trim() || rawTitle;
       const body = d("main")
         .text()
         .replace(/\s+/g, " ")
         .trim()
         .slice(0, 600);
 
+      // タイトルに含まれる日付（例：2月3日）を抽出
+      const dateMatch = rawTitle.match(/（(\d+月\d+日)）/);
+      const updated = dateMatch ? dateMatch[1] : "";
+
       if (title) {
         const audiences = await classifyByLLM({ title, body });
-        items.push({ title, url, body, audiences });
+        items.push({ title, url, body, updated, audiences });
         console.log("分類完了:", title, audiences);
       }
 
