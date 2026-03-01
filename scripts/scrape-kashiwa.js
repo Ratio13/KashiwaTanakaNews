@@ -16,7 +16,7 @@ async function classifyByLLM({ title, body }) {
 
 【出力形式】
 {
-  "tags": ["student", "worker", "senior" から適合するものを1つ以上選択],
+  "audiences"配列: ["student", "worker", "senior" から適合するものを1つ以上選択],
   "summary": "リンク先ページの内容を300字程度に要約したもの"
 }
 
@@ -56,7 +56,7 @@ async function classifyByLLM({ title, body }) {
     };
   } catch (e) {
     console.error("分類・要約失敗:", e);
-    return { tags: ["worker"], summary: body.slice(0, 300) };
+    return { tags: ["error"], summary: body.slice(0, 300) };
   }
 }
 
