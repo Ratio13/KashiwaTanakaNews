@@ -9,7 +9,21 @@ const INDEX = "https://www.city.kashiwa.lg.jp/shinchaku/index.html";
 const ua = { "user-agent": "kashiwa-news-bot" };
 
 async function classifyByLLM({ title, body }) {
-  const prompt = `このページの新着情報リスト全てに対して、それぞれのリンク先コンテンツを読み、「学生向け」「社会人向け」「高齢者向け」のどれに近い内容かどうかを判別し、JSON配列オブジェクト内にそれぞれstudent/worker/seniorのタグを付けてください。各情報それぞれへのタグは空欄にはできず、複数付与が可能です。さらに、各情報のリンク先ページの内容を300字程度に要約して、変数に取り込んでください\nタイトル:${title}\n本文:${body}`;
+  const prompt = `以下のニュース記事（タイトルと本文）を読み、情報を整理して指定のJSON形式のみで出力してください。
+
+タイトル: ${title}
+本文: ${body}
+
+【出力形式】
+{
+  "tags": ["student", "worker", "senior" から適合するものを1つ以上選択],
+  "summary": "リンク先ページの内容を300字程度に要約したもの"
+}
+
+【ルール】
+- JSON以外の説明文や挨拶は一切含めないでください。
+- tagsは必ず1つ以上含めてください。
+- 要約は客観的かつ簡潔に日本語で記述してください。`;
 
   try {
     const r = await fetch(process.env.GEMINI_API_URL, {
@@ -20,16 +34,29 @@ async function classifyByLLM({ title, body }) {
       },
       body: JSON.stringify({
         contents: [{ role: "user", parts: [{ text: prompt }] }],
-        generationConfig: { temperature: 0 },
+        generationConfig: {
+          temperature: 0,
+          response_mime_type: "application/json"
+        },
       }),
     });
 
     const data = await r.json();
-    const text = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() ?? "[]";
-    return JSON.parse(text);
+    let text = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() ?? "{}";
+
+    // 堅牢なパース: Markdownのコードブロックが含まれる場合を除去
+    if (text.startsWith("```")) {
+      text = text.replace(/^```(?:json)?\n?/, "").replace(/\n?```$/, "").trim();
+    }
+
+    const parsed = JSON.parse(text);
+    return {
+      tags: Array.isArray(parsed.tags) ? parsed.tags : ["worker"],
+      summary: parsed.summary || body.slice(0, 300)
+    };
   } catch (e) {
-    console.error("分類失敗:", e);
-    return ["worker"];
+    console.error("分類・要約失敗:", e);
+    return { tags: ["worker"], summary: body.slice(0, 300) };
   }
 }
 
@@ -71,9 +98,16 @@ async function classifyByLLM({ title, body }) {
       const updated = dateMatch ? dateMatch[1] : "";
 
       if (title) {
-        const audiences = await classifyByLLM({ title, body });
-        items.push({ title, url, body, updated, audiences });
-        console.log("分類完了:", title, audiences);
+        const result = await classifyByLLM({ title, body });
+        items.push({
+          title,
+          url,
+          body,
+          updated,
+          audiences: result.tags,
+          summary: result.summary
+        });
+        console.log("分類・要約完了:", title, result.tags);
       }
 
     } catch (e) {
