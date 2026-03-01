@@ -15,12 +15,12 @@
     :root {
       --primary-color: #f7b42c;
       --secondary-color: #f89b29;
-      --bg-color: #fff9f0;
+      --bg-color: #fffaf5;
       --header-bg: #ffffff;
       --text-color: #4a4a4a;
-      --card-bg: #ffffff;
-      --border-radius: 20px;
-      --shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+      --table-bg: #ffffff;
+      --border-radius: 12px;
+      --shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
       --student-color: #4facfe;
       --worker-color: #f093fb;
       --senior-color: #43e97b;
@@ -37,214 +37,188 @@
       line-height: 1.6;
       background-color: var(--bg-color);
       color: var(--text-color);
-      font-size: 18px;
+      font-size: 16px;
     }
 
     .container {
-      max-width: 1000px;
+      max-width: 1200px;
       margin: 0 auto;
       padding: 0 20px;
     }
 
     header {
       background-color: var(--header-bg);
-      padding: 60px 0 40px;
+      padding: 40px 0 30px;
       text-align: center;
-      border-bottom: 4px solid #fdf0d5;
+      border-bottom: 2px solid #eee;
     }
 
     header h1 {
       font-family: 'Kiwi Maru', serif;
-      font-size: 2.5rem;
+      font-size: 2rem;
       color: #d17b0f;
       margin-bottom: 10px;
     }
 
     .subtitle {
-      font-size: 1.1rem;
+      font-size: 1rem;
       color: #666;
-      margin-bottom: 20px;
     }
 
     nav {
       background-color: white;
-      padding: 10px 0;
+      padding: 15px 0;
       position: sticky;
       top: 0;
       z-index: 1000;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
     }
 
     .tabs {
       display: flex;
       justify-content: center;
-      gap: 15px;
-      flex-wrap: wrap;
+      gap: 10px;
     }
 
     .tab-btn {
-      padding: 12px 30px;
-      border: none;
-      background: #f0f0f0;
+      padding: 10px 20px;
+      border: 1px solid #eee;
+      background: #f8f8f8;
       border-radius: 50px;
       font-weight: bold;
-      font-size: 1rem;
       cursor: pointer;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      color: #777;
+      transition: all 0.3s ease;
+      color: #888;
     }
 
-    .tab-btn.active[data-tab="student"] {
-      background: var(--student-color);
+    .tab-btn.active {
+      background: var(--primary-color);
       color: white;
-      box-shadow: 0 8px 20px rgba(79, 172, 254, 0.3);
-    }
-
-    .tab-btn.active[data-tab="worker"] {
-      background: var(--worker-color);
-      color: white;
-      box-shadow: 0 8px 20px rgba(240, 147, 251, 0.3);
-    }
-
-    .tab-btn.active[data-tab="senior"] {
-      background: var(--senior-color);
-      color: white;
-      box-shadow: 0 8px 20px rgba(67, 233, 123, 0.3);
-    }
-
-    .tab-btn:hover:not(.active) {
-      transform: translateY(-2px);
-      background: #e5e5e5;
+      border-color: var(--primary-color);
+      box-shadow: 0 4px 10px rgba(247, 180, 44, 0.3);
     }
 
     main {
-      padding: 50px 0;
+      padding: 30px 0;
     }
 
-    .news-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 30px;
-      opacity: 1;
-      transition: opacity 0.3s ease;
-    }
-
-    .news-card {
-      background: var(--card-bg);
+    .table-container {
+      background: var(--table-bg);
       border-radius: var(--border-radius);
-      padding: 30px;
       box-shadow: var(--shadow);
-      text-decoration: none;
-      color: inherit;
-      display: flex;
-      flex-direction: column;
-      transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
-      border: 1px solid rgba(255, 255, 255, 0.8);
-      position: relative;
-      overflow: hidden;
+      overflow-x: auto;
+      border: 1px solid #eee;
     }
 
-    .news-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 4px;
-      height: 100%;
-      background: var(--primary-color);
-      opacity: 0.5;
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 800px;
     }
 
-    .news-card.student::before {
-      background: var(--student-color);
-    }
-
-    .news-card.worker::before {
-      background: var(--worker-color);
-    }
-
-    .news-card.senior::before {
-      background: var(--senior-color);
-    }
-
-    .news-card:hover {
-      transform: translateY(-10px);
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-      border-color: var(--primary-color);
-    }
-
-    .news-date {
-      font-size: 0.85rem;
-      color: #999;
-      margin-bottom: 15px;
+    th {
+      background: #fdfdfd;
+      text-align: left;
+      padding: 15px;
       font-weight: bold;
-      display: flex;
-      align-items: center;
-      gap: 5px;
+      color: #777;
+      border-bottom: 2px solid #eee;
+      white-space: nowrap;
+    }
+
+    td {
+      padding: 15px;
+      border-bottom: 1px solid #f5f5f5;
+      vertical-align: top;
+    }
+
+    tr:hover td {
+      background-color: #fffef9;
+    }
+
+    .col-date {
+      width: 100px;
+      color: #999;
+      font-size: 0.9rem;
+    }
+
+    .col-sche {
+      width: 120px;
+      color: #d17b0f;
+      font-weight: bold;
+      font-size: 0.9rem;
+    }
+
+    .col-content {
+      min-width: 300px;
+    }
+
+    .col-audience {
+      width: 180px;
     }
 
     .news-title {
-      font-size: 1.25rem;
+      display: block;
       font-weight: bold;
       color: #333;
-      margin-bottom: 15px;
-      line-height: 1.5;
+      text-decoration: none;
+      margin-bottom: 5px;
+      font-size: 1.1rem;
     }
 
-    .news-body {
-      font-size: 0.95rem;
+    .news-title:hover {
+      color: var(--primary-color);
+      text-decoration: underline;
+    }
+
+    .news-summary {
+      font-size: 0.9rem;
       color: #666;
-      margin-bottom: 20px;
       display: -webkit-box;
-      -webkit-line-clamp: 3;
-      line-clamp: 3;
+      -webkit-line-clamp: 2;
+      line-clamp: 2;
       -webkit-box-orient: vertical;
       overflow: hidden;
-      flex-grow: 1;
     }
 
-    .btn-more {
-      align-self: flex-start;
-      padding: 8px 20px;
-      border-radius: 50px;
-      background: #f8f9fa;
-      font-size: 0.85rem;
+    .tag {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 4px;
+      font-size: 0.75rem;
       font-weight: bold;
-      color: #555;
-      border: 1px solid #eee;
-      transition: all 0.3s ease;
+      margin: 2px;
+      color: white;
     }
 
-    .news-card:hover .btn-more {
-      background: var(--primary-color);
-      color: white;
-      border-color: transparent;
+    .tag-student {
+      background: var(--student-color);
+    }
+
+    .tag-worker {
+      background: var(--worker-color);
+    }
+
+    .tag-senior {
+      background: var(--senior-color);
     }
 
     .empty-msg {
       text-align: center;
-      padding: 100px 0;
-      color: #999;
-      font-size: 1.2rem;
-      grid-column: 1 / -1;
+      padding: 50px;
+      color: #bbb;
     }
 
     footer {
-      padding: 60px 0;
+      padding: 40px 0;
       text-align: center;
-      color: #aaa;
-      font-size: 0.9rem;
-      background: white;
+      color: #ccc;
+      font-size: 0.8rem;
     }
 
-    @media (max-width: 600px) {
-      header h1 {
-        font-size: 1.8rem;
-      }
-
-      .tab-btn {
-        padding: 10px 20px;
-        font-size: 0.9rem;
+    @media (max-width: 768px) {
+      .col-summary {
+        display: none;
       }
     }
   </style>
@@ -255,24 +229,37 @@
   <header>
     <div class="container">
       <h1>柏の葉＆柏たなか地域向け最新情報ページ</h1>
-      <p class="subtitle">あなたにぴったりの情報を、もっと身近に。</p>
-      <div id="last-fetched" style="font-size: 0.8rem; color: #bbb;"></div>
+      <p class="subtitle">公式情報を分かりやすく、あなたの暮らしにあわせて。</p>
+      <div id="last-fetched" style="font-size: 0.75rem; color: #ccc; margin-top: 10px;"></div>
     </div>
   </header>
 
   <nav>
     <div class="container">
       <div class="tabs">
-        <button class="tab-btn active" data-tab="worker">社会人向け</button>
+        <button class="tab-btn active" data-tab="all">すべて</button>
         <button class="tab-btn" data-tab="student">学生向け</button>
+        <button class="tab-btn" data-tab="worker">社会人向け</button>
         <button class="tab-btn" data-tab="senior">高齢者向け</button>
       </div>
     </div>
   </nav>
 
   <main class="container">
-    <div id="news-grid" class="news-grid">
-      <!-- JSで挿入 -->
+    <div class="table-container">
+      <table id="news-table">
+        <thead>
+          <tr>
+            <th class="col-date">発表日</th>
+            <th class="col-sche">実施予定日</th>
+            <th class="col-content">最新情報（見出し・要約）</th>
+            <th class="col-audience">対象</th>
+          </tr>
+        </thead>
+        <tbody id="news-body">
+          <!-- JSで挿入 -->
+        </tbody>
+      </table>
     </div>
   </main>
 
@@ -283,7 +270,7 @@
   </footer>
 
   <script>
-    const labels = {
+    const audienceLabels = {
       student: "学生向け",
       worker: "社会人向け",
       senior: "高齢者向け"
@@ -292,53 +279,99 @@
     let allNews = [];
 
     async function loadNews() {
-      const grid = document.getElementById('news-grid');
-      grid.style.opacity = '0.5';
-
+      const tbody = document.getElementById('news-body');
       try {
         const res = await fetch('data/news.json', { cache: 'no-store' });
         const data = await res.json();
         allNews = data.items;
 
         document.getElementById('last-fetched').textContent =
-          `最終取得: ${new Date(data.fetchedAt).toLocaleString('ja-JP')}`;
+          `更新日時: ${new Date(data.fetchedAt).toLocaleString('ja-JP')}`;
 
-        renderNews('worker'); // デフォルト
+        renderNews('all');
       } catch (e) {
         console.error(e);
-        grid.innerHTML = '<div class="empty-msg">データの読み込みに失敗しました。</div>';
-      } finally {
-        grid.style.opacity = '1';
+        tbody.innerHTML = '<tr><td colspan="4" class="empty-msg">読み込みに失敗しました。</td></tr>';
       }
     }
 
-    function renderNews(category) {
-      const grid = document.getElementById('news-grid');
-      grid.innerHTML = '';
+    function parseScheduledDate(title, body) {
+      // タイトルや本文から日付らしいものを抽出
+      const dateRegex = /(\d+月\d+日)/;
+      const match = title.match(dateRegex) || (body && body.match(dateRegex));
+      return match ? match[1] : "-";
+    }
 
-      const filtered = allNews.filter(item =>
-        item.audiences && item.audiences.includes(category)
-      );
+    function getAudienceTags(audiences) {
+      if (!audiences) return [];
+      // 互換性維持: audiencesが単なる文字列配列の場合と、オブジェクト配列の場合を両方ハンドル
+      if (Array.isArray(audiences)) {
+        return audiences.map(a => {
+          if (typeof a === 'string') return a;
+          if (a.tags) return a.tags;
+          return null;
+        }).flat().filter(Boolean);
+      }
+      return [];
+    }
+
+    function renderNews(filterTab) {
+      const tbody = document.getElementById('news-body');
+      tbody.innerHTML = '';
+
+      const filtered = filterTab === 'all'
+        ? allNews
+        : allNews.filter(item => {
+          const tags = getAudienceTags(item.audiences);
+          return tags.includes(filterTab);
+        });
 
       if (filtered.length === 0) {
-        grid.innerHTML = `<div class="empty-msg">${labels[category]}の情報は現在ありません。</div>`;
+        tbody.innerHTML = '<tr><td colspan="4" class="empty-msg">表示できる情報はありません。</td></tr>';
         return;
       }
 
       filtered.forEach(item => {
-        const card = document.createElement('a');
-        card.className = `news-card ${category}`;
-        card.href = item.url;
-        card.target = '_blank';
-        card.rel = 'noopener';
+        const tags = [...new Set(getAudienceTags(item.audiences))];
+        const scheduledDate = parseScheduledDate(item.title, item.body);
 
-        card.innerHTML = `
-                <div class="news-date">${item.updated || '新着'}</div>
-                <div class="news-title">${item.title}</div>
-                <div class="news-body">${item.body || ''}</div>
-                <div class="btn-more">詳細を見る</div>
-            `;
-        grid.appendChild(card);
+        const tr = document.createElement('tr');
+
+        // 発表日
+        const tdDate = document.createElement('td');
+        tdDate.className = 'col-date';
+        tdDate.textContent = item.updated || '-';
+        tr.appendChild(tdDate);
+
+        // 実施予定日
+        const tdSche = document.createElement('td');
+        tdSche.className = 'col-sche';
+        tdSche.textContent = scheduledDate;
+        tr.appendChild(tdSche);
+
+        // 内容
+        const tdContent = document.createElement('td');
+        tdContent.className = 'col-content';
+        tdContent.innerHTML = `
+          <a href="${item.url}" class="news-title" target="_blank" rel="noopener">${item.title}</a>
+          <div class="news-summary">${item.summary || item.body || ''}</div>
+        `;
+        tr.appendChild(tdContent);
+
+        // 対象
+        const tdAudience = document.createElement('td');
+        tdAudience.className = 'col-audience';
+        tags.forEach(tag => {
+          if (audienceLabels[tag]) {
+            const span = document.createElement('span');
+            span.className = `tag tag-${tag}`;
+            span.textContent = audienceLabels[tag];
+            tdAudience.appendChild(span);
+          }
+        });
+        tr.appendChild(tdAudience);
+
+        tbody.appendChild(tr);
       });
     }
 
